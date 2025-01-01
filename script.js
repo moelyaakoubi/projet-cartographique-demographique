@@ -1,19 +1,3 @@
-// Utilisation de l'API World Bank pour récupérer la population d'un pays
-fetch('http://api.worldbank.org/v2/country/FR/indicator/SP.POP.TOTL?format=json')
-  .then(response => response.json())  // Convertir la réponse en JSON
-  .then(data => {
-    const populationData = data[1];  // Les données réelles sont dans le second élément
-    populationData.forEach(item => {
-      console.log(`Année : ${item.date}, Population : ${item.value}`);
-      // Traiter les données pour afficher un graphique ou autre
-
-    });
-  })
-  .catch(error => {
-    console.error("Erreur lors de la récupération des données démographiques :", error);
-  });
-
-
 //-----------------------------------
 // Créer une carte centrée sur Paris
 // Initialisation de la carte avec Leaflet.js
@@ -51,51 +35,70 @@ arrondissements.forEach(({ coord, densite }) => {
 L.circle(coord,{
   color: 'red',
   fillColor: '#f03',
-  fillOpacity: 0.1,
-  radius: densite * 0.03 // Rayon basé sur la densité
+  fillOpacity: 0.4,
+  radius: densite * 0.5 // Rayon basé sur la densité
 }).addTo(map).bindPopup(`Densité de population : ${densite} habitants/km²`);
 });
 
 
 
-//-----------------------------------
-//Création d'un graphique linéaire avec D3.js
-const data = [
-  { year: 2010, population: 2200000 },
-  { year: 2011, population: 2225000 },
-  { year: 2012, population: 2250000 },
-  { year: 2013, population: 2275000 },
-  { year: 2020, population: 2300000 }
-];
+// Utilisation de l'API World Bank pour récupérer la population d'un pays
+fetch('http://api.worldbank.org/v2/country/FR/indicator/SP.POP.TOTL?format=json')
+      .then(response => response.json())
+      .then(data => {
+        const populationData = data[1]; // Les données réelles
+        const formattedData = populationData
+          .filter(item => item.value !== null) // Filtrer les valeurs nulles
+          .map(item => ({
+            year: +item.date, // Convertir en nombre
+            population: +item.value // Convertir en nombre
+          }))
+          .sort((a, b) => a.year - b.year); // Trier par année
 
-const svg = d3.select('#graph');
-const margin = { top: 20, right: 30, bottom: 30, left: 50 };
-const width = 600 - margin.left - margin.right;
-const height = 400 - margin.top - margin.bottom;
+        createGraph(formattedData); // Appeler la fonction pour créer le graphique
+      })
+      .catch(error => {
+        console.error("Erreur lors de la récupération des données démographiques :", error);
+      });
 
-const x = d3.scaleLinear()
-  .domain(d3.extent(data, d => d.year))
-  .range([margin.left, width + margin.left]);
-
-const y = d3.scaleLinear()
-  .domain([2000000, 2500000])
-  .range([height + margin.top, margin.top]);
-
-// Ajouter des axes
-svg.append('g')
-  .attr('transform', `translate(0,${height + margin.top})`)
-  .call(d3.axisBottom(x));
-svg.append('g')
-  .attr('transform', `translate(${margin.left},0)`)
-  .call(d3.axisLeft(y));
-
-// Ajouter la ligne
-svg.append('path')
-  .datum(data)
-  .attr('fill', 'none')
-  .attr('stroke', 'blue')
-  .attr('stroke-width', 2)
-  .attr('d', d3.line()
-    .x(d => x(d.year))
-    .y(d => y(d.population))
-  );
+    // Fonction pour créer le graphique
+    function createGraph(data) {
+      const svg = d3.select('#graph');
+      const containerWidth = document.getElementById('graph').clientWidth;
+      const containerHeight = document.getElementById('graph').clientHeight;
+    
+      const margin = { top: 20, right: 30, bottom: 30, left: 50 };
+      const width = containerWidth - margin.left - margin.right;
+      const height = containerHeight - margin.top - margin.bottom;
+    
+      const x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.year)) // Étendre sur les années
+        .range([margin.left, width + margin.left]);
+    
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.population)]) // Ajuster à la population max
+        .range([height + margin.top, margin.top]);
+    
+      // Efface le contenu précédent du SVG
+      svg.selectAll('*').remove();
+    
+      // Ajouter les axes
+      svg.append('g')
+        .attr('transform', `translate(0,${height + margin.top})`)
+        .call(d3.axisBottom(x).tickFormat(d3.format("d"))); // Format année sans virgule
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y));
+    
+      // Ajouter la ligne
+      svg.append('path')
+        .datum(data)
+        .attr('fill', 'none')
+        .attr('stroke', 'blue')
+        .attr('stroke-width', 2)
+        .attr('d', d3.line()
+          .x(d => x(d.year))
+          .y(d => y(d.population))
+        );
+    }
+    

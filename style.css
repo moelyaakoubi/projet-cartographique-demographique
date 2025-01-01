@@ -17,6 +17,11 @@ margin: 20px auto;
 border: 1px solid #ddd;
 border-radius: 8px;
 }
+#chart {
+    width: 90%; /* Laisser un peu d'espace sur les côtés */
+    margin: auto;
+  }
+  
 
 #graph{
 width: 90%;
@@ -26,3 +31,8 @@ border: 1px solid #ddd;
 border-radius: 8px;
 }
   
+svg {
+    width: 100%; /* Rend le SVG responsive */
+    height: 100%;
+    overflow: visible;
+  }
