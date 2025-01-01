@@ -3,33 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Carte et Population</title>
-
-  <!-- Inclusion des bibliothèques CSS et JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <title>Cartographie et Population</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <style>
-    /* Style pour la carte */
-    #map {
-      width: 100%;
-      height: 400px;
-    }
-    /* Style pour le graphique */
-    #chart {
-      margin-top: 20px;
-    }
-  </style>
 </head>
 <body>
-
-  <!-- Conteneur pour la carte -->
+  <h1>Cartographie et Flux de Population</h1>
   <div id="map"></div>
+  <h2>Évolution de la population</h2>
+  <div id="chart">
+    <svg id="graph"></svg>
+  </div>
 
-  <!-- Conteneur pour le graphique -->
-  <div id="chart"></div>
-
+  
   <script src="script.js"></script>
-
 </body>
 </html>

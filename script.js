@@ -6,6 +6,7 @@ fetch('http://api.worldbank.org/v2/country/FR/indicator/SP.POP.TOTL?format=json'
     populationData.forEach(item => {
       console.log(`Année : ${item.date}, Population : ${item.value}`);
       // Traiter les données pour afficher un graphique ou autre
+
     });
   })
   .catch(error => {
